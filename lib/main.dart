@@ -1,3 +1,5 @@
+import 'package:dam_u4_proyecto2_18401084/pages/add_asignacion.dart';
+import 'package:dam_u4_proyecto2_18401084/pages/asignacion_detalles.dart';
 import 'package:dam_u4_proyecto2_18401084/pages/asignaciones.dart';
 import 'package:dam_u4_proyecto2_18401084/pages/asistencias.dart';
 import 'package:dam_u4_proyecto2_18401084/pages/home.dart';
@@ -24,6 +26,8 @@ class MyApp extends StatelessWidget {
         '/asignaciones': (context) => PaginaAsignaciones(),
         '/asistencias': (context) => PaginaAsistencias(),
         '/reportes': (context) => PaginaReportes(),
+        '/addAsignacion': (context) => AddAsignacion(),
+        '/asignacionDetail': (context) => AsignacionDetails(),
       },
       debugShowCheckedModeBanner: false,
       theme: const CupertinoThemeData(),

@@ -1,4 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'add_asignacion.dart';
+import 'asignacion_detalles.dart';
+import 'asignaciones.dart';
+import 'asistencias.dart';
+import 'consultas.dart';
 
 class PaginaPrincipal extends StatefulWidget {
   const PaginaPrincipal({Key? key}) : super(key: key);
@@ -10,42 +15,55 @@ class PaginaPrincipal extends StatefulWidget {
 class _PaginaPrincipalState extends State<PaginaPrincipal> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text('Asistencia Tec'),
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
+        activeColor: CupertinoColors.activeOrange,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.list_bullet),
+            label: 'Asignaciones',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.check_mark_circled),
+            label: 'Asistencias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.search),
+            label: 'Consultas',
+          ),
+        ],
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Bienvenido al Registro de Asistencia',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 30),
-            CupertinoButton.filled(
-              child: Text('Gestionar Asignaciones'),
-              onPressed: () {
-                Navigator.pushNamed(context, '/asignaciones');
+      tabBuilder: (BuildContext context, int index) {
+        switch (index) {
+          case 0:
+            return CupertinoTabView(
+              routes: {
+                '/': (context) => PaginaAsignaciones(),
+                '/asignacionDetail': (context) => AsignacionDetails(),
+                '/addAsignacion': (context) => AddAsignacion(),
               },
-            ),
-            SizedBox(height: 10),
-            CupertinoButton.filled(
-              child: Text('Gestionar Asistencias'),
-              onPressed: () {
-                Navigator.pushNamed(context, '/asistencias');
+            );
+          case 1:
+            return CupertinoTabView(
+              routes: {
+                '/': (context) => PaginaAsistencias(),
+                // agrega aquí las demás rutas que necesites en esta vista
               },
-            ),
-            SizedBox(height: 10),
-            CupertinoButton.filled(
-              child: Text('Ver Reportes'),
-              onPressed: () {
-                Navigator.pushNamed(context, '/reportes');
+            );
+          case 2:
+            return CupertinoTabView(
+              routes: {
+                '/': (context) => Consultas(),
+                // agrega aquí las demás rutas que necesites en esta vista
               },
-            ),
-          ],
-        ),
-      ),
+            );
+          default:
+            return CupertinoTabView(builder: (context) {
+              return Center(child: Text('Página no encontrada'));
+            });
+        }
+      },
     );
   }
 }
-
-

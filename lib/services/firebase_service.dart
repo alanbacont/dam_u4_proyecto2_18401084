@@ -13,15 +13,14 @@ Future<List> getAsignaciones() async {
         "docente": data['docente'],
         "materia": data['materia'],
         "salon": data['salon'],
+        "uid":doc.id,
       };
       asignacion.add(asig);
     }
     print(asignacion); // Aquí imprimo los datos obtenidos de Firestore
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
     return asignacion;
 }
-
-
 
 Future<void> insertarAsignacion(String salon, edificio, horario, docente, materia) async{
   await db.collection("asignacion").add({
