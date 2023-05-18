@@ -29,6 +29,13 @@
             {
               "client_id": "119190073756-ib7tgjs5jtlduh4rin1v5a4fapdg4i0p.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "119190073756-5muumbpm51i7985k7jdrdrs2vu8d9ca1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "mx.edu.ittepic.damU4Proyecto218401084"
+              }
             }
           ]
         }
