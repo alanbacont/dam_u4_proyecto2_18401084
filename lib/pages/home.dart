@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'add_asignacion.dart';
-import 'asignacion_detalles.dart';
 import 'asignaciones.dart';
-import 'asistencias.dart';
 import 'consultas.dart';
 
 class PaginaPrincipal extends StatefulWidget {
@@ -13,10 +10,19 @@ class PaginaPrincipal extends StatefulWidget {
 }
 
 class _PaginaPrincipalState extends State<PaginaPrincipal> {
+  int _currentIndex = 0;
+
+  final _tabPages = <Widget>[
+    PaginaAsignaciones(),
+    Consultas(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
+        height: 70,
+        iconSize: 30,
         backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
         activeColor: CupertinoColors.activeOrange,
         items: const <BottomNavigationBarItem>[
@@ -25,44 +31,19 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
             label: 'Asignaciones',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.check_mark_circled),
-            label: 'Asistencias',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.search),
             label: 'Consultas',
           ),
         ],
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
       tabBuilder: (BuildContext context, int index) {
-        switch (index) {
-          case 0:
-            return CupertinoTabView(
-              routes: {
-                '/': (context) => PaginaAsignaciones(),
-                '/asignacionDetail': (context) => AsignacionDetails(),
-                '/addAsignacion': (context) => AddAsignacion(),
-              },
-            );
-          case 1:
-            return CupertinoTabView(
-              routes: {
-                '/': (context) => PaginaAsistencias(),
-                // agrega aquí las demás rutas que necesites en esta vista
-              },
-            );
-          case 2:
-            return CupertinoTabView(
-              routes: {
-                '/': (context) => Consultas(),
-                // agrega aquí las demás rutas que necesites en esta vista
-              },
-            );
-          default:
-            return CupertinoTabView(builder: (context) {
-              return Center(child: Text('Página no encontrada'));
-            });
-        }
+        return _tabPages[_currentIndex];
       },
     );
   }

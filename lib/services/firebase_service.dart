@@ -22,6 +22,18 @@ Future<List> getAsignaciones() async {
     return asignacion;
 }
 
+Future<Map<String, dynamic>> getAsignacion(String uid) async {
+  try {
+    DocumentSnapshot doc = await FirebaseFirestore.instance.collection('asignacion').doc(uid).get();
+    return doc.data() as Map<String, dynamic>;
+  } catch (e) {
+    print('Error al obtener asignación: $e');
+    // Devuelve un mapa vacío si no se puede obtener la asignación
+    return {};
+  }
+}
+
+
 Future<void> insertarAsignacion(String salon, edificio, horario, docente, materia) async{
   await db.collection("asignacion").add({
     "salon":salon,
@@ -115,13 +127,27 @@ Future<List> getAsistenciasPorRangoFechasEdificio(DateTime fechaInicio, DateTime
   return asistencias;
 }
 
-Future<List> getAsistenciasPorRevisor(String nombreRevisor) async {
-  List asistencias = [];
+Future<List<Map<String, dynamic>>> getAsistenciasPorRevisor(String nombreRevisor) async {
+  List<Map<String, dynamic>> asistencias = [];
   QuerySnapshot querySnapshot = await db
       .collectionGroup('asistencia')
       .where('revisor', isEqualTo: nombreRevisor)
       .get();
-  asistencias.addAll(querySnapshot.docs.map((doc) => doc.data()).toList());
+
+  for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+    DocumentSnapshot asignacionSnapshot = await doc.reference.parent.parent!.get();
+
+    if (asignacionSnapshot.exists) {
+      Map<String, dynamic>? asistenciaData = doc.data() as Map<String, dynamic>?;
+
+      if (asistenciaData != null) {
+        asistenciaData['asignacion'] = asignacionSnapshot.data() as Map<String, dynamic>?;
+        asistencias.add(asistenciaData);
+      }
+    }
+  }
+
   return asistencias;
 }
+
 

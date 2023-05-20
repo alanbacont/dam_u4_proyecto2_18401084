@@ -57,8 +57,15 @@ class _PaginaAsignacionesState extends State<PaginaAsignaciones> {
                     itemBuilder: (context, index) {
                       final asignacion = snapshot.data![index];
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/asignacionDetail', arguments: asignacion);
+                        onTap: () async {
+                          await Navigator.pushNamed(context, '/asignacionDetail', arguments: asignacion);
+                          setState(() {const Center(
+                            child: CupertinoActivityIndicator(
+                              radius: 40,
+                              color: CupertinoColors.activeOrange,
+                            ),
+                          );});
+
                         },
                         onLongPress: () {
                           setState(() {
@@ -70,9 +77,9 @@ class _PaginaAsignacionesState extends State<PaginaAsignaciones> {
                           });
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                          padding: EdgeInsets.all(10),
                           child: Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(0.2),
                             decoration: BoxDecoration(
                               border: Border(
                                   bottom: BorderSide(color: CupertinoColors.systemGrey, width: 2.0),
@@ -131,7 +138,6 @@ class _PaginaAsignacionesState extends State<PaginaAsignaciones> {
               Align(
                 alignment: Alignment.center,
                 child: CupertinoButton(
-                  //alignment: Alignment.center,
                   color: CupertinoColors.destructiveRed,
                   child: Text('Eliminar ${selectedAsignaciones.length}', style: TextStyle(color: CupertinoColors.white),),
                   onPressed: () {

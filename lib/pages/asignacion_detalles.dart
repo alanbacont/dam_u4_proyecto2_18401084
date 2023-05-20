@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dam_u4_proyecto2_18401084/services/firebase_service.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'asistencias.dart';
 
 class AsignacionDetails extends StatefulWidget {
   const AsignacionDetails({Key? key}) : super(key: key);
@@ -15,6 +18,8 @@ class _AsignacionDetailsState extends State<AsignacionDetails> {
   final _docenteController = TextEditingController();
   final _materiaController = TextEditingController();
 
+  late Map<String, dynamic> asignacion;
+
   @override
   void dispose() {
     _salonController.dispose();
@@ -25,7 +30,18 @@ class _AsignacionDetailsState extends State<AsignacionDetails> {
     super.dispose();
   }
 
-  void mostrarActualizarAsignacion(BuildContext context, Map<String, dynamic> asignacion) {
+  Future<Map<String, dynamic>> getAsignacion(String uid) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('asignacion').doc(uid).get();
+      return doc.data() as Map<String, dynamic>;
+    } catch (e) {
+      print('Error al obtener asignación: $e');
+      // Devuelve un mapa vacío si no se puede obtener la asignación
+      return {};
+    }
+  }
+
+  void mostrarActualizarAsignacion(BuildContext context) {
     _salonController.text = asignacion['salon'];
     _edificioController.text = asignacion['edificio'];
     _horarioController.text = asignacion['horario'];
@@ -61,13 +77,18 @@ class _AsignacionDetailsState extends State<AsignacionDetails> {
         cancelButton: CupertinoActionSheetAction(
           child: const Text('Actualizar'),
           onPressed: () async {
-            await FirebaseFirestore.instance.collection('asignacion').doc(asignacion['id']).update({
+            await FirebaseFirestore.instance.collection('asignacion').doc(asignacion['uid']).update({
               "salon": _salonController.text,
               "edificio": _edificioController.text,
               "horario": _horarioController.text,
               "docente": _docenteController.text,
               "materia": _materiaController.text,
             });
+
+            // Obtiene la asignación actualizada y refresca la UI
+            asignacion = await getAsignacion(asignacion['uid']);
+            setState(() {});
+
             Navigator.pop(context);
           },
         ),
@@ -77,7 +98,7 @@ class _AsignacionDetailsState extends State<AsignacionDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final asignacion = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    asignacion = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -85,72 +106,56 @@ class _AsignacionDetailsState extends State<AsignacionDetails> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.pencil),
-          onPressed: () => mostrarActualizarAsignacion(context, asignacion),
+          onPressed: () => mostrarActualizarAsignacion(context),
         ),
       ),
       child: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: CupertinoTheme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: CupertinoColors.systemGrey.withOpacity(0.2),
-                  spreadRadius: 1,
-                  blurRadius: 7,
-                  offset: Offset(3, 3),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            children: [
+              CupertinoFormSection(
+                header: Text("Detalles de Asignado", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                 children: [
-                  Row(
-                    children: [
-                      Icon(CupertinoIcons.person_fill, color: CupertinoTheme.of(context).primaryColor,),
-                      SizedBox(width: 10),
-                      Text('Docente: ${asignacion["docente"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor, fontWeight: FontWeight.bold)),
-                    ],
+                  CupertinoFormRow(
+                    child: Text('Docente: ${asignacion["docente"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor),),
+                    prefix: Icon(CupertinoIcons.person_fill, color: CupertinoColors.activeOrange,),
+                    padding: EdgeInsets.all(11.0),
                   ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(CupertinoIcons.textformat, color: CupertinoTheme.of(context).primaryColor,),
-                      SizedBox(width: 10),
-                      Text('Salón: ${asignacion["salon"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor)),
-                    ],
+                  CupertinoFormRow(
+                    child: Text('Salón: ${asignacion["salon"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor),),
+                    prefix: Icon(CupertinoIcons.textformat, color: CupertinoColors.activeOrange,),
+                    padding: EdgeInsets.all(11.0),
                   ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(CupertinoIcons.building_2_fill, color: CupertinoTheme.of(context).primaryColor,),
-                      SizedBox(width: 10),
-                      Text('Edificio: ${asignacion["edificio"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor)),
-                    ],
+                  CupertinoFormRow(
+                    child: Text('Edificio: ${asignacion["edificio"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor),),
+                    prefix: Icon(CupertinoIcons.building_2_fill, color: CupertinoColors.activeOrange),
+                    padding: EdgeInsets.all(11.0),
                   ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(CupertinoIcons.clock, color: CupertinoTheme.of(context).primaryColor,),
-                      SizedBox(width: 10),
-                      Text('Horario: ${asignacion["horario"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor)),
-                    ],
+                  CupertinoFormRow(
+                    child: Text('Horario: ${asignacion["horario"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor),),
+                    prefix: Icon(CupertinoIcons.clock, color: CupertinoColors.activeOrange),
+                    padding: EdgeInsets.all(11.0),
                   ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(CupertinoIcons.book_fill, color: CupertinoTheme.of(context).primaryColor,),
-                      SizedBox(width: 10),
-                      Text('Materia: ${asignacion["materia"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor)),
-                    ],
+                  CupertinoFormRow(
+                    child: Text('Materia: ${asignacion["materia"]}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor),),
+                    prefix: Icon(CupertinoIcons.book_fill, color: CupertinoColors.activeOrange,),
+                    padding: EdgeInsets.all(11.0),
                   ),
                 ],
               ),
-            ),
+              Padding(padding: EdgeInsets.all(40)),
+              CupertinoButton.filled(
+                pressedOpacity: 0.7,
+                child: Text('Ver Asistencias'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(builder: (context) => PaginaAsistencias(asignacionId: asignacion['uid'].toString())),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
